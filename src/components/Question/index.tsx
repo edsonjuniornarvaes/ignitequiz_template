@@ -26,8 +26,8 @@ export function QuizCard({ data, index, ...rest }: Props) {
   return (
     <TouchableOpacityAnimated
       style={styles.container}
-      entering={FadeInUp.delay(index * 100)}
-      exiting={FadeOut}
+      entering={enteringKeyFrame.duration(400)}
+      exiting={exitingKeyFrame.duration(400)}
       {...rest}
     >
       <View style={styles.header}>
