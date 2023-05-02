@@ -1,36 +1,44 @@
-import { View, Text } from 'react-native';
+import {
+  TouchableOpacity,
+  TouchableOpacityProps,
+  Text,
+  View,
+} from "react-native";
+import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
 
-import { Option } from '../Option';
-import { styles } from './styles';
+const TouchableOpacityAnimated =
+  Animated.createAnimatedComponent(TouchableOpacity);
 
-type QuestionProps = {
-  title: string;
-  alternatives: string[];
-}
+import { styles } from "./styles";
+import { THEME } from "../../styles/theme";
 
-type Props = {
-  question: QuestionProps;
-  alternativeSelected?: number | null;
-  setAlternativeSelected?: (value: number) => void;
-}
+import { LevelBars } from "../LevelBars";
+import { QUIZZES } from "../../data/quizzes";
 
-export function Question({ question, alternativeSelected, setAlternativeSelected }: Props) {
+type Props = TouchableOpacityProps & {
+  data: (typeof QUIZZES)[0];
+  index: number;
+};
+
+export function QuizCard({ data, index, ...rest }: Props) {
+  const Icon = data.svg;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        {question.title}
-      </Text>
+    <TouchableOpacityAnimated
+      style={styles.container}
+      entering={FadeInUp.delay(index * 100)}
+      exiting={FadeOut}
+      {...rest}
+    >
+      <View style={styles.header}>
+        <View style={styles.iconContainer}>
+          {Icon && <Icon size={24} color={THEME.COLORS.GREY_100} />}
+        </View>
 
-      {
-        question.alternatives.map((alternative, index) => (
-          <Option
-            key={index}
-            title={alternative}
-            checked={alternativeSelected === index}
-            onPress={() => setAlternativeSelected && setAlternativeSelected(index)}
-          />
-        ))
-      }
-    </View>
+        <LevelBars level={data.level} />
+      </View>
+
+      <Text style={styles.title}>{data.title}</Text>
+    </TouchableOpacityAnimated>
   );
 }
