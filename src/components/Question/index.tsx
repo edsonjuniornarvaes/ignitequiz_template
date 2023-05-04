@@ -1,44 +1,70 @@
-import {
-  TouchableOpacity,
-  TouchableOpacityProps,
-  Text,
-  View,
-} from "react-native";
-import Animated, { FadeInUp, FadeOut } from "react-native-reanimated";
+import { Dimensions, Text } from "react-native";
+import Animated, { Keyframe } from "react-native-reanimated";
 
-const TouchableOpacityAnimated =
-  Animated.createAnimatedComponent(TouchableOpacity);
-
+import { Option } from "../Option";
 import { styles } from "./styles";
-import { THEME } from "../../styles/theme";
 
-import { LevelBars } from "../LevelBars";
-import { QUIZZES } from "../../data/quizzes";
-
-type Props = TouchableOpacityProps & {
-  data: (typeof QUIZZES)[0];
-  index: number;
+type QuestionProps = {
+  title: string;
+  alternatives: string[];
 };
 
-export function QuizCard({ data, index, ...rest }: Props) {
-  const Icon = data.svg;
+type Props = {
+  question: QuestionProps;
+  alternativeSelected?: number | null;
+  setAlternativeSelected?: (value: number) => void;
+};
+
+const SCREEN_WIDTH = Dimensions.get("window").width;
+
+export function Question({
+  question,
+  alternativeSelected,
+  setAlternativeSelected,
+}: Props) {
+  const enteringKeyFrame = new Keyframe({
+    0: {
+      opacity: 0,
+      transform: [{ translateX: SCREEN_WIDTH }, { rotate: "90deg" }],
+    },
+    70: {
+      opacity: 0.3,
+    },
+    100: {
+      opacity: 1,
+      transform: [{ translateX: 0 }, { rotate: "0deg" }],
+    },
+  });
+
+  const exitingKeyFrame = new Keyframe({
+    from: {
+      opacity: 1,
+      transform: [{ translateX: 0 }, { rotate: "0deg" }],
+    },
+    to: {
+      opacity: 0,
+      transform: [{ translateX: SCREEN_WIDTH * -1 }, { rotate: "-90deg" }],
+    },
+  });
 
   return (
-    <TouchableOpacityAnimated
+    <Animated.View
       style={styles.container}
       entering={enteringKeyFrame.duration(400)}
       exiting={exitingKeyFrame.duration(400)}
-      {...rest}
     >
-      <View style={styles.header}>
-        <View style={styles.iconContainer}>
-          {Icon && <Icon size={24} color={THEME.COLORS.GREY_100} />}
-        </View>
+      <Text style={styles.title}>{question.title}</Text>
 
-        <LevelBars level={data.level} />
-      </View>
-
-      <Text style={styles.title}>{data.title}</Text>
-    </TouchableOpacityAnimated>
+      {question.alternatives.map((alternative, index) => (
+        <Option
+          key={index}
+          title={alternative}
+          checked={alternativeSelected === index}
+          onPress={() =>
+            setAlternativeSelected && setAlternativeSelected(index)
+          }
+        />
+      ))}
+    </Animated.View>
   );
 }
