@@ -95,6 +95,7 @@ export function History() {
                 </View>
               )}
             >
+              RF
               <HistoryCard data={item} />
             </Swipeable>
           </Animated.View>
